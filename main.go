@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"log"
 
@@ -32,6 +33,8 @@ func (g *Game) Update() error {
 	// Check game configs
 	if ebiten.IsKeyPressed(ebiten.KeyF11) {
 		g.GameConfig.ToggleFullscreen()
+	} else if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+		return errors.New("close_game")
 	}
 
 	// Counting seconds since game start
@@ -75,6 +78,9 @@ func main() {
 	GameSingleton.GameConfig = &gamecfg
 
 	if err := ebiten.RunGame(GameSingleton); err != nil {
-		log.Fatal(err)
+		if err.Error() != "close_game" {
+			log.Fatal(err)
+		}
+
 	}
 }
