@@ -13,8 +13,11 @@ import (
 //go:embed assets/*
 var AssetServer embed.FS
 
+var GameSingleton *Game
+
 type Game struct {
 	SceneManager            *scenes.SceneManager
+	GameConfig              *config.GameConfig
 	FrameCounter            uint
 	SecondsSinceGameStarted uint
 	musicPlayerCh           chan *AudioPlayer
@@ -25,6 +28,11 @@ type Game struct {
 func (g *Game) Update() error {
 	// Start Audio Player
 	// To do
+
+	// Check game configs
+	if ebiten.IsKeyPressed(ebiten.KeyF11) {
+		g.GameConfig.ToggleFullscreen()
+	}
 
 	// Counting seconds since game start
 	g.FrameCounter++
@@ -41,6 +49,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Receive screen reference
 	g.SceneManager.CurrentRunningScene(screen)
 
+	// Test if the game changed its config
+	if g.GameConfig.Fullscreen != ebiten.IsFullscreen() {
+		ebiten.SetFullscreen(g.GameConfig.Fullscreen)
+	}
+
 	if g.SecondsSinceGameStarted >= 5 {
 		g.SceneManager.StartTitleScreen()
 	}
@@ -51,16 +64,17 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	gamecfg := config.GameConfig{Width: 1280, Height: 720, Title: "Go Pong Go!!!"}
+	gamecfg := config.GameConfig{Width: 1280, Height: 720, Title: "Go Pong Go!!!", Fullscreen: false}
 
 	ebiten.SetWindowSize(gamecfg.Width, gamecfg.Height)
 	ebiten.SetWindowTitle(gamecfg.Title)
 	ebiten.SetVsyncEnabled(true)
 
-	gameSingleton := &Game{}
-	gameSingleton.SceneManager = scenes.CreateSceneManager(&AssetServer)
+	GameSingleton = &Game{}
+	GameSingleton.SceneManager = scenes.CreateSceneManager(&AssetServer)
+	GameSingleton.GameConfig = &gamecfg
 
-	if err := ebiten.RunGame(gameSingleton); err != nil {
+	if err := ebiten.RunGame(GameSingleton); err != nil {
 		log.Fatal(err)
 	}
 }
