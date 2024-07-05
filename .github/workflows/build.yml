@@ -16,7 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-          fetch-depth: 1
+          fetch-depth: 0
+          lfs: 'true'
 
     - name: Download necessary packages for 64 bits and 32 bits computers
       run: |
