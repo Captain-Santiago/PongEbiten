@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"log"
 
@@ -9,14 +10,22 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+//go:embed assets/*
+var AssetServer embed.FS
+
 type Game struct {
 	SceneManager            *scenes.SceneManager
 	FrameCounter            uint
 	SecondsSinceGameStarted uint
+	musicPlayerCh           chan *AudioPlayer
+	errCh                   chan error
 }
 
 // Run 60 times a second
 func (g *Game) Update() error {
+	// Start Audio Player
+	// To do
+
 	// Counting seconds since game start
 	g.FrameCounter++
 	if g.FrameCounter >= 60 {
@@ -49,7 +58,7 @@ func main() {
 	ebiten.SetVsyncEnabled(true)
 
 	gameSingleton := &Game{}
-	gameSingleton.SceneManager = scenes.CreateSceneManager()
+	gameSingleton.SceneManager = scenes.CreateSceneManager(&AssetServer)
 
 	if err := ebiten.RunGame(gameSingleton); err != nil {
 		log.Fatal(err)
