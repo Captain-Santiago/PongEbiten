@@ -23,11 +23,15 @@ func CreateSceneManager(assets *embed.FS) *SceneManager {
 }
 
 func (sm *SceneManager) CurrentRunningScene(screen *ebiten.Image) {
+	// Debug
+	// titlescreen.DrawTitleScreen(screen, *sm.AssetServer)
+	// return
+
 	switch sm.CurrentScene {
 	case LOGO:
 		logo.DrawLogoScreen(screen, sm.AssetServer)
 	case TITLE_SCREEN:
-		titlescreen.DrawTitleScreen(screen)
+		titlescreen.DrawTitleScreen(screen, *sm.AssetServer)
 	default:
 		panic("not reached")
 	}

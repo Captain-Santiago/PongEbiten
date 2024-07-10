@@ -9,12 +9,11 @@ import (
 	"github.com/Captain-Santiago/PongEbiten/config"
 	"github.com/Captain-Santiago/PongEbiten/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //go:embed assets/*
 var AssetServer embed.FS
-
-var GameSingleton *Game
 
 type Game struct {
 	SceneManager            *scenes.SceneManager
@@ -31,10 +30,15 @@ func (g *Game) Update() error {
 	// To do
 
 	// Check game configs
-	if ebiten.IsKeyPressed(ebiten.KeyF11) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyF11) {
 		g.GameConfig.ToggleFullscreen()
-	} else if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		return errors.New("close_game")
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		return errors.New(CLOSE_GAME_STR)
+	}
+
+	// Test if the game changed its config
+	if g.GameConfig.Fullscreen != ebiten.IsFullscreen() {
+		ebiten.SetFullscreen(g.GameConfig.Fullscreen)
 	}
 
 	// Counting seconds since game start
@@ -49,21 +53,15 @@ func (g *Game) Update() error {
 
 // Vsynced, cannot be predicted
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Receive screen reference
 	g.SceneManager.CurrentRunningScene(screen)
 
-	// Test if the game changed its config
-	if g.GameConfig.Fullscreen != ebiten.IsFullscreen() {
-		ebiten.SetFullscreen(g.GameConfig.Fullscreen)
-	}
-
-	if g.SecondsSinceGameStarted >= 5 {
+	if g.SecondsSinceGameStarted >= 4 {
 		g.SceneManager.StartTitleScreen()
 	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return outsideWidth / 4, outsideHeight / 4
+	return 320, 180
 }
 
 func main() {
@@ -73,12 +71,12 @@ func main() {
 	ebiten.SetWindowTitle(gamecfg.Title)
 	ebiten.SetVsyncEnabled(true)
 
-	GameSingleton = &Game{}
-	GameSingleton.SceneManager = scenes.CreateSceneManager(&AssetServer)
-	GameSingleton.GameConfig = &gamecfg
+	game := &Game{}
+	game.SceneManager = scenes.CreateSceneManager(&AssetServer)
+	game.GameConfig = &gamecfg
 
-	if err := ebiten.RunGame(GameSingleton); err != nil {
-		if err.Error() != "close_game" {
+	if err := ebiten.RunGame(game); err != nil {
+		if err.Error() != CLOSE_GAME_STR {
 			log.Fatal(err)
 		}
 
