@@ -10,14 +10,14 @@ const AUDIO_SAMPLE_RATE = 48000
 
 // AudioPlayer represents the current audio state.
 type AudioPlayer struct {
-	game         *Game
-	audioContext *audio.Context
-	audioPlayer  *audio.Player
-	current      time.Duration
-	total        time.Duration
-	seBytes      []byte
-	seCh         chan []byte
-	volume128    int
+	Game         *Game
+	AudioContext *audio.Context
+	AudioPlayer  *audio.Player
+	Current      time.Duration
+	Total        time.Duration
+	SeBytes      []byte
+	SeCh         chan []byte
+	Volume128    int
 }
 
 func NewGame() (*Game, error) {
