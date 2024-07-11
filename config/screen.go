@@ -5,6 +5,9 @@ type GameConfig struct {
 	Title         string
 	Vsync         bool
 	Fullscreen    bool
+
+	// Save File
+	SaveFilePath string
 }
 
 func (gc *GameConfig) ToggleFullscreen() {
@@ -12,6 +15,16 @@ func (gc *GameConfig) ToggleFullscreen() {
 		gc.Fullscreen = false
 	} else {
 		gc.Fullscreen = true
+	}
+}
+
+func NewGameConfig() *GameConfig {
+	return &GameConfig{
+		Width:        1280,
+		Height:       720,
+		Title:        "Go Pong Go!!!",
+		Fullscreen:   false,
+		SaveFilePath: "./save.dat",
 	}
 }
 
