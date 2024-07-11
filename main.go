@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/Captain-Santiago/PongEbiten/audio"
@@ -48,7 +47,6 @@ func (g *Game) Update() error {
 	if g.FrameCounter >= 60 {
 		g.FrameCounter = 0
 		g.SecondsSinceGameStarted++
-		fmt.Printf("Seconds passed: %d\n", g.SecondsSinceGameStarted)
 	}
 	return nil
 }
