@@ -9,40 +9,17 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 )
 
 var ctx *audio.Context
 var isMusicPlaying bool
+var isScreenFullyLoaded bool
+var logoScreen image.Image
 
 func init() {
 	ctx = audio.NewContext(48000)
 	isMusicPlaying = false
-}
-
-func playLogoMusic(game_assets *embed.FS) {
-	isMusicPlaying = true
-
-	// Read music file from disk
-	musicByteArray, err := game_assets.ReadFile("assets/logo/background_song.wav")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Decode music file
-	musicDecoded, err := wav.DecodeWithoutResampling(bytes.NewReader(musicByteArray))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	go func() {
-		player, err := ctx.NewPlayer(musicDecoded)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		player.Play()
-	}()
+	isScreenFullyLoaded = false
 }
 
 func DrawLogoScreen(screen *ebiten.Image, game_assets *embed.FS) {
@@ -51,16 +28,21 @@ func DrawLogoScreen(screen *ebiten.Image, game_assets *embed.FS) {
 		playLogoMusic(game_assets)
 	}
 
-	// Get logo byte array
-	logoImageFS, err := game_assets.ReadFile("assets/logo/logo_screen.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
+	if !isScreenFullyLoaded {
+		// Get logo byte array
+		logoImageFS, err := game_assets.ReadFile("assets/logo/logo_screen.png")
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-	// Decode byte array
-	img, _, err := image.Decode(bytes.NewBuffer(logoImageFS))
-	if err != nil {
-		log.Fatalln(err)
+		// Decode byte array
+		logoScreen, _, err = image.Decode(bytes.NewBuffer(logoImageFS))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		// Load the image just once
+		isScreenFullyLoaded = true
 	}
 
 	// Scaling sizes
@@ -68,5 +50,5 @@ func DrawLogoScreen(screen *ebiten.Image, game_assets *embed.FS) {
 	geom.Scale(0.25, 0.25)
 
 	screen.Fill(color.White)
-	screen.DrawImage(ebiten.NewImageFromImage(img), &ebiten.DrawImageOptions{GeoM: geom})
+	screen.DrawImage(ebiten.NewImageFromImage(logoScreen), &ebiten.DrawImageOptions{GeoM: geom})
 }

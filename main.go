@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/Captain-Santiago/PongEbiten/audio"
@@ -10,6 +11,7 @@ import (
 	"github.com/Captain-Santiago/PongEbiten/savegame"
 	"github.com/Captain-Santiago/PongEbiten/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -42,6 +44,11 @@ func (g *Game) Update() error {
 		ebiten.SetFullscreen(g.GameConfig.Fullscreen)
 	}
 
+	// Change scenes
+	if g.SecondsSinceGameStarted >= 4 {
+		g.SceneManager.StartTitleScreen()
+	}
+
 	// Counting seconds since game start
 	g.FrameCounter++
 	if g.FrameCounter >= 60 {
@@ -55,9 +62,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.SceneManager.CurrentRunningScene(screen)
 
-	if g.SecondsSinceGameStarted >= 4 {
-		g.SceneManager.StartTitleScreen()
-	}
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("%f", ebiten.ActualFPS()))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
