@@ -1,7 +1,7 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Build test
+name: Build Linux
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
         sudo apt update
         sudo apt install gcc libc6-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev libasound2-dev \
         pkg-config gcc-multilib libc6-dev:i386 libgl1-mesa-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libxinerama-dev:i386 libxrandr-dev:i386 \
-        libxxf86vm-dev:i386 libasound2-dev:i386 gcc-mingw-w64-x86-64 -y
+        libxxf86vm-dev:i386 libasound2-dev:i386 -y
 
 
 
