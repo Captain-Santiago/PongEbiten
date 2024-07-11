@@ -27,7 +27,7 @@ builds:
 
     overrides:
     - goos: windows
-      goarch: amd64
+      goarch: amd64_v1
       env:
         - CC=x86_64-w64-mingw32-gcc
 
