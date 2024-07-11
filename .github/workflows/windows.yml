@@ -10,8 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-
-  build:
+  build-windows:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
@@ -25,4 +24,4 @@ jobs:
         go-version: "1.22.5"
 
     - name: Build for Windows
-      run: CC=gcc-mingw-w64-x86-64 go build -v ./...
+      run: CGO_ENABLED=1 go build -v ./...
