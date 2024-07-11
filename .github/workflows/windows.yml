@@ -23,10 +23,5 @@ jobs:
       with:
         go-version: "1.22.5"
 
-    - name: Set up MinGW
-      uses: egor-tensin/setup-mingw@v2
-      with:
-        platform: x64
-
     - name: Build for Windows
       run: go build -v ./...
