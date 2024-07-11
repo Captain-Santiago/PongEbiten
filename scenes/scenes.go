@@ -2,6 +2,7 @@ package scenes
 
 import (
 	"embed"
+	"fmt"
 
 	"github.com/Captain-Santiago/PongEbiten/scenes/logo"
 	"github.com/Captain-Santiago/PongEbiten/scenes/titlescreen"
@@ -11,6 +12,8 @@ import (
 const (
 	LOGO = iota
 	TITLE_SCREEN
+	SINGLEPLAYER
+	MULTIPLAYER
 )
 
 type SceneManager struct {
@@ -31,7 +34,11 @@ func (sm *SceneManager) CurrentRunningScene(screen *ebiten.Image) {
 	case LOGO:
 		logo.DrawLogoScreen(screen, sm.AssetServer)
 	case TITLE_SCREEN:
-		titlescreen.DrawTitleScreen(screen, *sm.AssetServer)
+		titlescreen.DrawTitleScreen(screen, sm.AssetServer)
+	case SINGLEPLAYER:
+		fmt.Println("To be implemented")
+	case MULTIPLAYER:
+		fmt.Println("To be implemented")
 	default:
 		panic("not reached")
 	}

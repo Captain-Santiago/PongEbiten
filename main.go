@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Captain-Santiago/PongEbiten/audio"
 	"github.com/Captain-Santiago/PongEbiten/config"
+	"github.com/Captain-Santiago/PongEbiten/savegame"
 	"github.com/Captain-Santiago/PongEbiten/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -20,13 +22,13 @@ type Game struct {
 	GameConfig              *config.GameConfig
 	FrameCounter            uint
 	SecondsSinceGameStarted uint
-	musicPlayerCh           chan *AudioPlayer
-	errCh                   chan error
+	MusicPlayerCh           chan *audio.AudioPlayer
+	ErrCh                   chan error
 }
 
 // Run 60 times a second
 func (g *Game) Update() error {
-	// Start Audio Player
+	// Update Audio Player
 	// To do
 
 	// Check game configs
@@ -65,7 +67,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	gamecfg := config.GameConfig{Width: 1280, Height: 720, Title: "Go Pong Go!!!", Fullscreen: false}
+	gamecfg := config.NewGameConfig()
+	savegame.InitSaveFile(gamecfg.SaveFilePath)
 
 	ebiten.SetWindowSize(gamecfg.Width, gamecfg.Height)
 	ebiten.SetWindowTitle(gamecfg.Title)
@@ -73,7 +76,7 @@ func main() {
 
 	game := &Game{}
 	game.SceneManager = scenes.CreateSceneManager(&AssetServer)
-	game.GameConfig = &gamecfg
+	game.GameConfig = gamecfg
 
 	if err := ebiten.RunGame(game); err != nil {
 		if err.Error() != CLOSE_GAME_STR {
@@ -81,4 +84,6 @@ func main() {
 		}
 
 	}
+
+	savegame.CloseSaveFile()
 }
