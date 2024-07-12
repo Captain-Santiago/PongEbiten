@@ -45,9 +45,17 @@ func (g *Game) Update() error {
 	}
 
 	// Change scenes
-	if g.SecondsSinceGameStarted >= 4 {
+	if g.SceneManager.CurrentScene == 0 && g.SecondsSinceGameStarted >= 4 {
 		g.SceneManager.StartTitleScreen()
 	}
+
+	// Check if its in the titlescreen
+	if g.SceneManager.CurrentScene == 1 && ebiten.IsKeyPressed(ebiten.KeySpace) {
+		g.SceneManager.StartSinglePlayer()
+	}
+
+	// Move Players
+	g.UpdatePlayerMovement()
 
 	// Counting seconds since game start
 	g.FrameCounter++

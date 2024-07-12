@@ -25,7 +25,7 @@ func init() {
 	isScreenFullyLoaded = false
 }
 
-func DrawLogoScreen(screen *ebiten.Image, game_assets *embed.FS) {
+func Draw(screen *ebiten.Image, game_assets *embed.FS) {
 	// Start music as soon as possible
 	if !isMusicPlaying {
 		playLogoMusic(game_assets)

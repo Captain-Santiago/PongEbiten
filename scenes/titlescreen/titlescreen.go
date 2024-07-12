@@ -48,7 +48,7 @@ func readFonts(assets *embed.FS) {
 	btnFont = text.NewGoXFace(btnFontFace)
 }
 
-func DrawTitleScreen(screen *ebiten.Image, assets *embed.FS) {
+func Draw(screen *ebiten.Image, assets *embed.FS) {
 	if titlescreenFont == nil {
 		readFonts(assets)
 	}

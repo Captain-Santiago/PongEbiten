@@ -2,8 +2,8 @@ package scenes
 
 import (
 	"embed"
-	"fmt"
 
+	"github.com/Captain-Santiago/PongEbiten/scenes/game"
 	"github.com/Captain-Santiago/PongEbiten/scenes/logo"
 	"github.com/Captain-Santiago/PongEbiten/scenes/titlescreen"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -17,8 +17,10 @@ const (
 )
 
 type SceneManager struct {
-	CurrentScene uint8
-	AssetServer  *embed.FS
+	CurrentScene   uint8
+	AssetServer    *embed.FS
+	MoveX1, MoveY1 int
+	MoveX2, MoveY2 int
 }
 
 func CreateSceneManager(assets *embed.FS) *SceneManager {
@@ -27,18 +29,18 @@ func CreateSceneManager(assets *embed.FS) *SceneManager {
 
 func (sm *SceneManager) CurrentRunningScene(screen *ebiten.Image) {
 	// Debug
-	titlescreen.DrawTitleScreen(screen, sm.AssetServer)
-	return
+	// game.Start(screen, true)
+	// return
 
 	switch sm.CurrentScene {
 	case LOGO:
-		logo.DrawLogoScreen(screen, sm.AssetServer)
+		logo.Draw(screen, sm.AssetServer)
 	case TITLE_SCREEN:
-		titlescreen.DrawTitleScreen(screen, sm.AssetServer)
+		titlescreen.Draw(screen, sm.AssetServer)
 	case SINGLEPLAYER:
-		fmt.Println("To be implemented")
+		game.Start(screen, true)
 	case MULTIPLAYER:
-		fmt.Println("To be implemented")
+		game.Start(screen, false)
 	default:
 		panic("not reached")
 	}
@@ -46,4 +48,8 @@ func (sm *SceneManager) CurrentRunningScene(screen *ebiten.Image) {
 
 func (sm *SceneManager) StartTitleScreen() {
 	sm.CurrentScene = TITLE_SCREEN
+}
+
+func (sm *SceneManager) StartSinglePlayer() {
+	sm.CurrentScene = SINGLEPLAYER
 }
