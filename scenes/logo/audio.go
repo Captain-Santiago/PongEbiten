@@ -23,12 +23,11 @@ func playLogoMusic(game_assets *embed.FS) {
 		log.Fatalln(err)
 	}
 
-	go func() {
-		player, err := ctx.NewPlayer(musicDecoded)
-		if err != nil {
-			log.Fatalln(err)
-		}
+	player, err := ctx.NewPlayer(musicDecoded)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-		player.Play()
-	}()
+	// Play music in a different green thread
+	go player.Play()
 }
