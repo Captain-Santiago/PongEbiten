@@ -9,40 +9,20 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 )
 
-var ctx *audio.Context
-var isMusicPlaying bool
+var (
+	ctx                 *audio.Context
+	isMusicPlaying      bool
+	isScreenFullyLoaded bool
+	logoScreen          *ebiten.Image
+	logoEbiten          *ebiten.Image
+)
 
 func init() {
 	ctx = audio.NewContext(48000)
 	isMusicPlaying = false
-}
-
-func playLogoMusic(game_assets *embed.FS) {
-	isMusicPlaying = true
-
-	// Read music file from disk
-	musicByteArray, err := game_assets.ReadFile("assets/logo/background_song.wav")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Decode music file
-	musicDecoded, err := wav.DecodeWithoutResampling(bytes.NewReader(musicByteArray))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	go func() {
-		player, err := ctx.NewPlayer(musicDecoded)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		player.Play()
-	}()
+	isScreenFullyLoaded = false
 }
 
 func DrawLogoScreen(screen *ebiten.Image, game_assets *embed.FS) {
@@ -51,22 +31,44 @@ func DrawLogoScreen(screen *ebiten.Image, game_assets *embed.FS) {
 		playLogoMusic(game_assets)
 	}
 
-	// Get logo byte array
-	logoImageFS, err := game_assets.ReadFile("assets/logo/logo_screen.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
+	if !isScreenFullyLoaded {
+		// Get logo byte array
+		logoImageFS, err := game_assets.ReadFile("assets/logo/logo_screen.png")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		// Decode byte array
+		logoScreenDecoded, _, err := image.Decode(bytes.NewBuffer(logoImageFS))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		logoScreen = ebiten.NewImageFromImage(logoScreenDecoded)
 
-	// Decode byte array
-	img, _, err := image.Decode(bytes.NewBuffer(logoImageFS))
-	if err != nil {
-		log.Fatalln(err)
+		// Get ebiten logo
+		logoEbitenFS, err := game_assets.ReadFile("assets/logo/logo_ebiten.png")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		// Decode byte array
+		logoEbitenDecoded, _, err := image.Decode(bytes.NewBuffer(logoEbitenFS))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		logoEbiten = ebiten.NewImageFromImage(logoEbitenDecoded)
+
+		// Load the image just once
+		isScreenFullyLoaded = true
 	}
 
 	// Scaling sizes
 	geom := ebiten.GeoM{}
 	geom.Scale(0.25, 0.25)
 
+	geomEbiten := ebiten.GeoM{}
+	geomEbiten.Scale(0.25, 0.25)
+	geomEbiten.Translate(260, 120)
+
 	screen.Fill(color.White)
-	screen.DrawImage(ebiten.NewImageFromImage(img), &ebiten.DrawImageOptions{GeoM: geom})
+	screen.DrawImage(logoScreen, &ebiten.DrawImageOptions{GeoM: geom})
+	screen.DrawImage(logoEbiten, &ebiten.DrawImageOptions{GeoM: geomEbiten})
 }

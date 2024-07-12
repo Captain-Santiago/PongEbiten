@@ -23,7 +23,7 @@ func NewGameConfig() *GameConfig {
 		Width:        1280,
 		Height:       720,
 		Title:        "Go Pong Go!!!",
-		Fullscreen:   false,
+		Fullscreen:   true,
 		SaveFilePath: "./save.dat",
 	}
 }
