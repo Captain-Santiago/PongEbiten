@@ -27,8 +27,8 @@ func CreateSceneManager(assets *embed.FS) *SceneManager {
 
 func (sm *SceneManager) CurrentRunningScene(screen *ebiten.Image) {
 	// Debug
-	// titlescreen.DrawTitleScreen(screen, *sm.AssetServer)
-	// return
+	titlescreen.DrawTitleScreen(screen, sm.AssetServer)
+	return
 
 	switch sm.CurrentScene {
 	case LOGO:
