@@ -8,7 +8,6 @@ import (
 
 	"github.com/Captain-Santiago/PongEbiten/audio"
 	"github.com/Captain-Santiago/PongEbiten/config"
-	"github.com/Captain-Santiago/PongEbiten/savegame"
 	"github.com/Captain-Santiago/PongEbiten/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -61,8 +60,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	gamecfg := config.NewGameConfig()
-	savegame.InitSaveFile(gamecfg.SaveFilePath)
-	defer savegame.CloseSaveFile()
+	// savegame.InitSaveFile(gamecfg.SaveFilePath)
+	// defer savegame.CloseSaveFile()
 
 	ebiten.SetWindowSize(gamecfg.Width, gamecfg.Height)
 	ebiten.SetWindowTitle(gamecfg.Title)

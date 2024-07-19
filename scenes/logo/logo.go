@@ -12,11 +12,10 @@ import (
 )
 
 var (
-	ctx                 *audio.Context
-	isMusicPlaying      bool
-	isScreenFullyLoaded bool
-	logoScreen          *ebiten.Image
-	logoEbiten          *ebiten.Image
+	ctx            *audio.Context
+	isMusicPlaying bool
+	logoScreen     *ebiten.Image
+	logoEbiten     *ebiten.Image
 )
 
 type LogoScreen struct {
@@ -26,6 +25,30 @@ type LogoScreen struct {
 }
 
 func New(assets *embed.FS) *LogoScreen {
+	// Get logo byte array
+	logoImageFS, err := assets.ReadFile("assets/logo/logo_screen.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Decode byte array
+	logoScreenDecoded, _, err := image.Decode(bytes.NewBuffer(logoImageFS))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	logoScreen = ebiten.NewImageFromImage(logoScreenDecoded)
+
+	// Get ebiten logo
+	logoEbitenFS, err := assets.ReadFile("assets/logo/logo_ebiten.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Decode byte array
+	logoEbitenDecoded, _, err := image.Decode(bytes.NewBuffer(logoEbitenFS))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	logoEbiten = ebiten.NewImageFromImage(logoEbitenDecoded)
+
 	return &LogoScreen{
 		game_assets:   assets,
 		SecondsPassed: 0,
@@ -37,7 +60,6 @@ func (l *LogoScreen) Update() error {
 	if ctx == nil {
 		ctx = audio.NewContext(48000)
 		isMusicPlaying = false
-		isScreenFullyLoaded = false
 	}
 
 	l.ticks += 1
@@ -54,35 +76,6 @@ func (l *LogoScreen) Draw(screen *ebiten.Image) {
 	// Start music as soon as possible
 	if !isMusicPlaying {
 		playLogoMusic(l.game_assets)
-	}
-
-	if !isScreenFullyLoaded {
-		// Get logo byte array
-		logoImageFS, err := l.game_assets.ReadFile("assets/logo/logo_screen.png")
-		if err != nil {
-			log.Fatalln(err)
-		}
-		// Decode byte array
-		logoScreenDecoded, _, err := image.Decode(bytes.NewBuffer(logoImageFS))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		logoScreen = ebiten.NewImageFromImage(logoScreenDecoded)
-
-		// Get ebiten logo
-		logoEbitenFS, err := l.game_assets.ReadFile("assets/logo/logo_ebiten.png")
-		if err != nil {
-			log.Fatalln(err)
-		}
-		// Decode byte array
-		logoEbitenDecoded, _, err := image.Decode(bytes.NewBuffer(logoEbitenFS))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		logoEbiten = ebiten.NewImageFromImage(logoEbitenDecoded)
-
-		// Load the image just once
-		isScreenFullyLoaded = true
 	}
 
 	// Scaling sizes

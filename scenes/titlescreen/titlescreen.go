@@ -19,6 +19,9 @@ type TitleScreen struct {
 }
 
 func New(assets *embed.FS) *TitleScreen {
+	readFonts(assets)
+	loadUI(assets)
+
 	return &TitleScreen{
 		assets:         assets,
 		IsSingleplayer: false,
@@ -64,15 +67,7 @@ func readFonts(assets *embed.FS) {
 }
 
 func (t *TitleScreen) Draw(screen *ebiten.Image) {
-	if titlescreenFont == nil {
-		readFonts(t.assets)
-	}
-
-	if btnIdle == nil {
-		loadUI(t.assets)
-	}
-
-	// Clear Background
+	// Draw Background
 	screen.Fill(color.RGBA{0x12, 0x90, 0x8e, 1})
 
 	// Draw Game Title
