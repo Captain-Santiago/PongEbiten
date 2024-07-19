@@ -44,37 +44,19 @@ func (g *Game) Update() error {
 		ebiten.SetFullscreen(g.GameConfig.Fullscreen)
 	}
 
-	// Change scenes
-	if g.SceneManager.CurrentScene == 0 && g.SecondsSinceGameStarted >= 4 {
-		g.SceneManager.StartTitleScreen()
-	}
+	g.SceneManager.Update()
 
-	// Check if its in the titlescreen
-	if g.SceneManager.CurrentScene == 1 && ebiten.IsKeyPressed(ebiten.KeySpace) {
-		g.SceneManager.StartSinglePlayer()
-	}
-
-	// Move Players
-	g.UpdatePlayerMovement()
-
-	// Counting seconds since game start
-	g.FrameCounter++
-	if g.FrameCounter >= 60 {
-		g.FrameCounter = 0
-		g.SecondsSinceGameStarted++
-	}
 	return nil
 }
 
 // Vsynced, cannot be predicted
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.SceneManager.CurrentRunningScene(screen)
-
+	g.SceneManager.CurrentScene.Draw(screen)
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("%f", ebiten.ActualFPS()))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 180
+	return 1920, 1080
 }
 
 func main() {
@@ -86,7 +68,7 @@ func main() {
 	ebiten.SetVsyncEnabled(true)
 
 	game := &Game{}
-	game.SceneManager = scenes.CreateSceneManager(&AssetServer)
+	game.SceneManager = scenes.New(&AssetServer)
 	game.GameConfig = gamecfg
 
 	if err := ebiten.RunGame(game); err != nil {

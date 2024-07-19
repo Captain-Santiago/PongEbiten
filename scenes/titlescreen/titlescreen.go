@@ -11,6 +11,18 @@ import (
 	"golang.org/x/image/font"
 )
 
+type TitleScreen struct {
+	assets     *embed.FS
+	NextScreen bool
+}
+
+func New(assets *embed.FS) *TitleScreen {
+	return &TitleScreen{
+		assets:     assets,
+		NextScreen: false,
+	}
+}
+
 func readFonts(assets *embed.FS) {
 	// Title font load
 	title_font, err := assets.ReadFile("assets/fonts/kidpixies/KidpixiesRegular-p0Z1.ttf")
@@ -23,7 +35,7 @@ func readFonts(assets *embed.FS) {
 		log.Fatal(err)
 	}
 	title_font_Face := truetype.NewFace(s, &truetype.Options{
-		Size:    8,
+		Size:    8 * 6,
 		DPI:     300,
 		Hinting: font.HintingFull,
 	})
@@ -48,13 +60,13 @@ func readFonts(assets *embed.FS) {
 	btnFont = text.NewGoXFace(btnFontFace)
 }
 
-func Draw(screen *ebiten.Image, assets *embed.FS) {
+func (t *TitleScreen) Draw(screen *ebiten.Image) {
 	if titlescreenFont == nil {
-		readFonts(assets)
+		readFonts(t.assets)
 	}
 
 	if btnIdle == nil {
-		loadUI(assets)
+		loadUI(t.assets)
 	}
 
 	// Clear Background
@@ -62,33 +74,41 @@ func Draw(screen *ebiten.Image, assets *embed.FS) {
 
 	// Draw Game Title
 	op := &text.DrawOptions{}
-	op.GeoM.Translate(60, 10)
+	op.GeoM.Translate(60*6, 10*6)
 	op.ColorScale.ScaleWithColor(color.RGBA{0xf9, 0x8f, 0x45, 255})
 	text.Draw(screen, "Title Screen", titlescreenFont, op)
 
 	// Draw Button Layout
 	opBtnIcon := &ebiten.DrawImageOptions{}
-	opBtnIcon.GeoM.Scale(0.88, 0.4)
-	opBtnIcon.GeoM.Translate(70, 65)
+	opBtnIcon.GeoM.Scale(0.88*6, 0.4*6)
+	opBtnIcon.GeoM.Translate(70*6, 65*6)
 	screen.DrawImage(btnIdle, opBtnIcon)
 
 	// Draw Start Button Text
 	opBtns := &text.DrawOptions{}
-	opBtns.GeoM.Scale(0.75, 0.75)
-	opBtns.GeoM.Translate(80, 80)
+	opBtns.GeoM.Scale(0.75*6, 0.75*6)
+	opBtns.GeoM.Translate(80*6, 80*6)
 	opBtns.ColorScale.Scale(255, 105, 0, 1)
 	text.Draw(screen, "Start Game", btnFont, opBtns)
 
 	// Draw Button Layout
 	opBtnQuitIcon := &ebiten.DrawImageOptions{}
-	opBtnQuitIcon.GeoM.Scale(0.88, 0.4)
-	opBtnQuitIcon.GeoM.Translate(70, 110)
+	opBtnQuitIcon.GeoM.Scale(0.88*6, 0.6*6)
+	opBtnQuitIcon.GeoM.Translate(70*6, 110*6)
 	screen.DrawImage(btnHover, opBtnQuitIcon)
 
 	// Draw Quit Text
 	opQuitBtns := &text.DrawOptions{}
-	opQuitBtns.GeoM.Scale(0.75, 0.75)
-	opQuitBtns.GeoM.Translate(80, 120)
+	opQuitBtns.GeoM.Scale(0.75*6, 0.75*6)
+	opQuitBtns.GeoM.Translate(80*6, 120*6)
 	opQuitBtns.ColorScale.Scale(255, 105, 0, 1)
 	text.Draw(screen, "Quit", btnFont, opQuitBtns)
+}
+
+func (t *TitleScreen) Update() error {
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		t.NextScreen = true
+	}
+
+	return nil
 }

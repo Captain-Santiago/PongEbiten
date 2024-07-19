@@ -19,21 +19,46 @@ var (
 	logoEbiten          *ebiten.Image
 )
 
-func init() {
-	ctx = audio.NewContext(48000)
-	isMusicPlaying = false
-	isScreenFullyLoaded = false
+type LogoScreen struct {
+	game_assets   *embed.FS
+	SecondsPassed uint
+	ticks         uint
 }
 
-func Draw(screen *ebiten.Image, game_assets *embed.FS) {
+func New(assets *embed.FS) *LogoScreen {
+	return &LogoScreen{
+		game_assets:   assets,
+		SecondsPassed: 0,
+		ticks:         0,
+	}
+}
+
+func (l *LogoScreen) Update() error {
+	if ctx == nil {
+		ctx = audio.NewContext(48000)
+		isMusicPlaying = false
+		isScreenFullyLoaded = false
+	}
+
+	l.ticks += 1
+
+	if l.ticks == 60 {
+		l.ticks = 0
+		l.SecondsPassed++
+	}
+
+	return nil
+}
+
+func (l *LogoScreen) Draw(screen *ebiten.Image) {
 	// Start music as soon as possible
 	if !isMusicPlaying {
-		playLogoMusic(game_assets)
+		playLogoMusic(l.game_assets)
 	}
 
 	if !isScreenFullyLoaded {
 		// Get logo byte array
-		logoImageFS, err := game_assets.ReadFile("assets/logo/logo_screen.png")
+		logoImageFS, err := l.game_assets.ReadFile("assets/logo/logo_screen.png")
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -45,7 +70,7 @@ func Draw(screen *ebiten.Image, game_assets *embed.FS) {
 		logoScreen = ebiten.NewImageFromImage(logoScreenDecoded)
 
 		// Get ebiten logo
-		logoEbitenFS, err := game_assets.ReadFile("assets/logo/logo_ebiten.png")
+		logoEbitenFS, err := l.game_assets.ReadFile("assets/logo/logo_ebiten.png")
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -62,11 +87,10 @@ func Draw(screen *ebiten.Image, game_assets *embed.FS) {
 
 	// Scaling sizes
 	geom := ebiten.GeoM{}
-	geom.Scale(0.25, 0.25)
+	geom.Scale(1.5, 1.5)
 
 	geomEbiten := ebiten.GeoM{}
-	geomEbiten.Scale(0.25, 0.25)
-	geomEbiten.Translate(260, 120)
+	geomEbiten.Translate(260*6, 120*6)
 
 	screen.Fill(color.White)
 	screen.DrawImage(logoScreen, &ebiten.DrawImageOptions{GeoM: geom})

@@ -3,10 +3,9 @@ package scenes
 import (
 	"embed"
 
-	"github.com/Captain-Santiago/PongEbiten/scenes/game"
 	"github.com/Captain-Santiago/PongEbiten/scenes/logo"
+	"github.com/Captain-Santiago/PongEbiten/scenes/singleplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/titlescreen"
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 const (
@@ -17,39 +16,33 @@ const (
 )
 
 type SceneManager struct {
-	CurrentScene   uint8
-	AssetServer    *embed.FS
-	MoveX1, MoveY1 int
-	MoveX2, MoveY2 int
+	CurrentScene Scenes
+	AssetServer  *embed.FS
 }
 
-func CreateSceneManager(assets *embed.FS) *SceneManager {
-	return &SceneManager{CurrentScene: LOGO, AssetServer: assets}
+func New(assets *embed.FS) *SceneManager {
+	return &SceneManager{CurrentScene: logo.New(assets), AssetServer: assets}
 }
 
-func (sm *SceneManager) CurrentRunningScene(screen *ebiten.Image) {
-	// Debug
-	// game.Start(screen, true)
-	// return
+func (sm *SceneManager) Update() error {
+	switch sm.CurrentScene.(type) {
+	case *logo.LogoScreen:
+		if sm.CurrentScene.(*logo.LogoScreen).SecondsPassed == 4 {
+			sm.CurrentScene = titlescreen.New(sm.AssetServer)
+		}
 
-	switch sm.CurrentScene {
-	case LOGO:
-		logo.Draw(screen, sm.AssetServer)
-	case TITLE_SCREEN:
-		titlescreen.Draw(screen, sm.AssetServer)
-	case SINGLEPLAYER:
-		game.Start(screen, true)
-	case MULTIPLAYER:
-		game.Start(screen, false)
+		sm.CurrentScene.Update()
+	case *titlescreen.TitleScreen:
+		if sm.CurrentScene.(*titlescreen.TitleScreen).NextScreen {
+			sm.CurrentScene = singleplayer.New(sm.AssetServer)
+		}
+
+		sm.CurrentScene.Update()
+	case *singleplayer.Singleplayer:
+		sm.CurrentScene.Update()
 	default:
 		panic("not reached")
 	}
-}
 
-func (sm *SceneManager) StartTitleScreen() {
-	sm.CurrentScene = TITLE_SCREEN
-}
-
-func (sm *SceneManager) StartSinglePlayer() {
-	sm.CurrentScene = SINGLEPLAYER
+	return nil
 }

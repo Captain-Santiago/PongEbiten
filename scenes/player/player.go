@@ -8,15 +8,15 @@ import (
 )
 
 type Player struct {
-	posX, posY    float32
+	PosX, PosY    float32
 	width, height float32
 	color         color.Color
 }
 
 func NewPlayer(initialPosX, initialPosY, width, height float32, playerColor color.Color) *Player {
 	return &Player{
-		posX:   initialPosX,
-		posY:   initialPosY,
+		PosX:   initialPosX,
+		PosY:   initialPosY,
 		width:  width,
 		height: height,
 		color:  playerColor,
@@ -24,5 +24,5 @@ func NewPlayer(initialPosX, initialPosY, width, height float32, playerColor colo
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
-	vector.DrawFilledRect(screen, p.posX, p.posY, p.width, p.height, p.color, false)
+	vector.DrawFilledRect(screen, p.PosX, p.PosY, p.width, p.height, p.color, false)
 }
