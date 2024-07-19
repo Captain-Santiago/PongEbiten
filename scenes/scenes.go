@@ -42,6 +42,6 @@ func (sm *SceneManager) Update() error {
 		}
 	}
 
-	sm.CurrentScene.Update()
-	return nil
+	err := sm.CurrentScene.Update()
+	return err
 }

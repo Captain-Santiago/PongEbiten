@@ -72,7 +72,7 @@ func (t *TitleScreen) Draw(screen *ebiten.Image) {
 		loadUI(t.assets)
 	}
 
-	// Clear Background
+	// Draw Background
 	screen.Fill(color.RGBA{0x12, 0x90, 0x8e, 1})
 
 	// Draw Game Title
