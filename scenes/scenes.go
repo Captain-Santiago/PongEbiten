@@ -32,8 +32,6 @@ func (sm *SceneManager) Update() error {
 			sm.CurrentScene = titlescreen.New(sm.AssetServer)
 		}
 
-		sm.CurrentScene.Update()
-
 	case *titlescreen.TitleScreen:
 		if sm.CurrentScene.(*titlescreen.TitleScreen).IsSingleplayer {
 			sm.CurrentScene = singleplayer.New(sm.AssetServer)
@@ -41,14 +39,9 @@ func (sm *SceneManager) Update() error {
 		} else if sm.CurrentScene.(*titlescreen.TitleScreen).IsMultiplayer {
 			sm.CurrentScene = multiplayer.New(sm.AssetServer)
 
-		} else {
-			sm.CurrentScene.Update()
-
 		}
-
-	default:
-		sm.CurrentScene.Update()
 	}
 
+	sm.CurrentScene.Update()
 	return nil
 }
