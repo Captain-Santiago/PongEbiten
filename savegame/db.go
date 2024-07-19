@@ -8,6 +8,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type Database struct {
+}
+
 var db *sql.DB
 var err error
 
@@ -39,6 +42,43 @@ func InitSaveFile(filePath string) {
 		log.Fatalln(err)
 	}
 }
+
+// func GetIdByName(name string) (int, error) {
+// 	rows, err := db.Query(`SELECT id FROM user WHERE name = ? LIMIT = 1`, name)
+// 	if err != nil {
+// 		return -1, err
+// 	}
+
+// 	var user_id []int
+// 	err = rows.Scan(&user_id)
+// 	if err != nil {
+// 		return -1, err
+// 	}
+
+// 	user_not_found := &ErrUserNotFound{name: name}
+// 	if len(user_id) == 0 {
+// 		return 0, user_not_found
+// 	}
+
+// 	return user_id[0], nil
+// }
+
+// func InsertNewElement(save Save, user_id int) error {
+// 	// Create user if not exists
+// 	user_id, err := GetIdByName(save.Name)
+// 	if errors. {
+
+// 	}
+
+// 	// Insert new data into the user
+// 	query, err := db.Query(`INSERT INTO save (user_id, points)
+// 							VALUES(?,?);`, user_id, save.Points)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
 
 func CloseSaveFile() {
 	if db != nil {

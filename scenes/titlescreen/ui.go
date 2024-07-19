@@ -12,7 +12,7 @@ import (
 
 var (
 	// Fonts used
-	titlescreenFont *text.GoTextFaceSource
+	titlescreenFont text.Face
 	btnFont         text.Face
 
 	// Button UI load
