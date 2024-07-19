@@ -4,6 +4,7 @@ import (
 	"embed"
 
 	"github.com/Captain-Santiago/PongEbiten/scenes/logo"
+	"github.com/Captain-Santiago/PongEbiten/scenes/multiplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/singleplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/titlescreen"
 )
@@ -32,16 +33,21 @@ func (sm *SceneManager) Update() error {
 		}
 
 		sm.CurrentScene.Update()
+
 	case *titlescreen.TitleScreen:
-		if sm.CurrentScene.(*titlescreen.TitleScreen).NextScreen {
+		if sm.CurrentScene.(*titlescreen.TitleScreen).IsSingleplayer {
 			sm.CurrentScene = singleplayer.New(sm.AssetServer)
+
+		} else if sm.CurrentScene.(*titlescreen.TitleScreen).IsMultiplayer {
+			sm.CurrentScene = multiplayer.New(sm.AssetServer)
+
+		} else {
+			sm.CurrentScene.Update()
+
 		}
 
-		sm.CurrentScene.Update()
-	case *singleplayer.Singleplayer:
-		sm.CurrentScene.Update()
 	default:
-		panic("not reached")
+		sm.CurrentScene.Update()
 	}
 
 	return nil

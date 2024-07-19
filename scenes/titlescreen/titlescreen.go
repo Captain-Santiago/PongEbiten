@@ -12,14 +12,17 @@ import (
 )
 
 type TitleScreen struct {
-	assets     *embed.FS
-	NextScreen bool
+	assets *embed.FS
+
+	IsSingleplayer bool
+	IsMultiplayer  bool
 }
 
 func New(assets *embed.FS) *TitleScreen {
 	return &TitleScreen{
-		assets:     assets,
-		NextScreen: false,
+		assets:         assets,
+		IsSingleplayer: false,
+		IsMultiplayer:  false,
 	}
 }
 
@@ -107,7 +110,11 @@ func (t *TitleScreen) Draw(screen *ebiten.Image) {
 
 func (t *TitleScreen) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		t.NextScreen = true
+		t.IsSingleplayer = true
+
+	} else if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+		t.IsMultiplayer = true
+
 	}
 
 	return nil

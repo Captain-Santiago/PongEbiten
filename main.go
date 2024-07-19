@@ -62,6 +62,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	gamecfg := config.NewGameConfig()
 	savegame.InitSaveFile(gamecfg.SaveFilePath)
+	defer savegame.CloseSaveFile()
 
 	ebiten.SetWindowSize(gamecfg.Width, gamecfg.Height)
 	ebiten.SetWindowTitle(gamecfg.Title)
@@ -75,8 +76,5 @@ func main() {
 		if err.Error() != CLOSE_GAME_STR {
 			log.Fatal(err)
 		}
-
 	}
-
-	savegame.CloseSaveFile()
 }
