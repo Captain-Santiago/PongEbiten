@@ -18,8 +18,8 @@ type Multiplayer struct {
 func New(assets *embed.FS) *Multiplayer {
 	return &Multiplayer{
 		assets:  assets,
-		player1: player.NewPlayer(10*6, 80*6, 10*6, 35*6, color.RGBA{255, 0, 0, 255}),
-		player2: player.NewPlayer(300*6, 80*6, 10*6, 35*6, color.RGBA{0, 0, 255, 255}),
+		player1: player.New(10*6, 80*6, 10*6, 35*6, color.RGBA{255, 0, 0, 255}),
+		player2: player.New(300*6, 80*6, 10*6, 35*6, color.RGBA{0, 0, 255, 255}),
 	}
 }
 

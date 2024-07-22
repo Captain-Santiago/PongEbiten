@@ -13,7 +13,7 @@ type Player struct {
 	color         color.Color
 }
 
-func NewPlayer(initialPosX, initialPosY, width, height float32, playerColor color.Color) *Player {
+func New(initialPosX, initialPosY, width, height float32, playerColor color.Color) *Player {
 	return &Player{
 		PosX:   initialPosX,
 		PosY:   initialPosY,

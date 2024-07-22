@@ -23,8 +23,8 @@ func New() *Ball {
 }
 
 func (b *Ball) Update() error {
-	b.PosX += 10
-	b.PosY += 10
+	b.PosX -= 10
+	b.PosY -= 10
 
 	if b.PosX > 1920 {
 		b.PosX = 0
