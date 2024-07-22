@@ -14,6 +14,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+const CLOSE_GAME_STR = "close_game"
+
 //go:embed assets/*
 var AssetServer embed.FS
 
