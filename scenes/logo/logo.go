@@ -59,7 +59,10 @@ func New(assets *embed.FS) *LogoScreen {
 func (l *LogoScreen) Update() error {
 	if ctx == nil {
 		ctx = audio.NewContext(48000)
-		isMusicPlaying = false
+
+		// ---------------------- DEBUG MUSIC OFF
+		isMusicPlaying = true
+		// ---------------------------
 	}
 
 	l.ticks += 1

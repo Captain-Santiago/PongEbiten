@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/Captain-Santiago/PongEbiten/scenes/ball"
+	"github.com/Captain-Santiago/PongEbiten/scenes/enemy"
 	"github.com/Captain-Santiago/PongEbiten/scenes/player"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -16,7 +17,7 @@ type Singleplayer struct {
 	assets *embed.FS
 
 	player1      *player.Player
-	enemy        *player.Player
+	enemy        *enemy.Enemy
 	ball         *ball.Ball
 	pointsPlayer int
 	enemyPlayer  int
@@ -38,8 +39,8 @@ func New(assets *embed.FS) *Singleplayer {
 
 	return &Singleplayer{
 		assets:       assets,
-		player1:      player.NewPlayer(10*6, 80*6, 10*6, 35*6, color.RGBA{255, 0, 0, 255}),
-		enemy:        player.NewPlayer(300*6, 80*6, 10*6, 35*6, color.RGBA{0, 0, 255, 255}),
+		player1:      player.New(10*6, 80*6, 10*6, 35*6, color.RGBA{255, 0, 0, 255}),
+		enemy:        enemy.New(300*6, 80*6, 10*6, 35*6, color.RGBA{0, 0, 255, 255}),
 		ball:         ball.New(),
 		pointsPlayer: 0,
 		enemyPlayer:  0,
@@ -74,6 +75,10 @@ func (s *Singleplayer) Update() error {
 	}
 
 	s.ball.Update()
+
+	// Enemy logic
+	s.enemy.BallY = s.ball.PosY
+	s.enemy.Update()
 
 	return nil
 }
