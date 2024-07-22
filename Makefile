@@ -14,10 +14,7 @@ run:
 
 # to do:  build-linux32 build-linuxARM
 release: build-windows64 build-windows32 build-windowsARM build-linux64
-	$(UPX) $(BIN)$(64BIT)$(WINDOWS_EXTENSION)
-	$(UPX) $(BIN)$(32BIT)$(WINDOWS_EXTENSION)
-	$(UPX) $(BIN)$(ARM)$(WINDOWS_EXTENSION)
-	$(UPX) $(BIN)$(64BIT)
+	$(UPX) $(BIN)$(64BIT)$(WINDOWS_EXTENSION) $(BIN)$(32BIT)$(WINDOWS_EXTENSION) $(BIN)$(64BIT)
 
 build-windows64:
 	GOOS=windows GOARCH=amd64 go build -o $(BIN)$(64BIT)$(WINDOWS_EXTENSION) .
