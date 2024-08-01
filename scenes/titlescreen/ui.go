@@ -1,12 +1,12 @@
 package titlescreen
 
 import (
-	"bytes"
 	"embed"
-	"image"
+	_ "image/png"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
@@ -21,22 +21,14 @@ var (
 )
 
 func loadUI(assets *embed.FS) {
-	// Loading just once in memory
-	if btnIdle != nil {
-		return
-	}
-
-	btnIdleBytes, err := assets.ReadFile("assets/titlescreen/button_idle.png")
+	var err error
+	btnIdle, _, err = ebitenutil.NewImageFromFileSystem(assets, "assets/titlescreen/button_idle.png")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	img, _, err := image.Decode(bytes.NewBuffer(btnIdleBytes))
-	btnIdle = ebiten.NewImageFromImage(img)
 
-	btnHoverBytes, err := assets.ReadFile("assets/titlescreen/button_hover.png")
+	btnHover, _, err = ebitenutil.NewImageFromFileSystem(assets, "assets/titlescreen/button_hover.png")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	img, _, err = image.Decode(bytes.NewBuffer(btnHoverBytes))
-	btnHover = ebiten.NewImageFromImage(img)
 }

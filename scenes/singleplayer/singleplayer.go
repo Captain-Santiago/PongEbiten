@@ -1,16 +1,16 @@
 package singleplayer
 
 import (
-	"bytes"
 	"embed"
-	"image"
 	"image/color"
+	_ "image/jpeg"
 	"log"
 
 	"github.com/Captain-Santiago/PongEbiten/scenes/ball"
 	"github.com/Captain-Santiago/PongEbiten/scenes/enemy"
 	"github.com/Captain-Santiago/PongEbiten/scenes/player"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Singleplayer struct {
@@ -25,17 +25,11 @@ type Singleplayer struct {
 }
 
 func New(assets *embed.FS) *Singleplayer {
-	backarray, err := assets.ReadFile("assets/game/ceu_azul.jpeg")
+	var err error
+	background, _, err := ebitenutil.NewImageFromFileSystem(assets, "assets/game/ceu_azul.jpeg")
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	backimg, _, err := image.Decode(bytes.NewBuffer(backarray))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	background := ebiten.NewImageFromImage(backimg)
 
 	return &Singleplayer{
 		assets:       assets,
