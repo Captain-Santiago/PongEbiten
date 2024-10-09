@@ -5,10 +5,9 @@ import (
 	"image/color"
 	"log"
 
-	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"golang.org/x/image/font"
 )
 
 type TitleScreen struct {
@@ -16,54 +15,44 @@ type TitleScreen struct {
 
 	IsSingleplayer bool
 	IsMultiplayer  bool
+
+	AudioContext *audio.Context
+	AudioPlayer  *audio.Player
 }
 
-func New(assets *embed.FS) *TitleScreen {
-	readFonts(assets)
-	loadUI(assets)
-
-	return &TitleScreen{
+func New(assets *embed.FS, audioCtx *audio.Context) *TitleScreen {
+	t := TitleScreen{
 		assets:         assets,
 		IsSingleplayer: false,
 		IsMultiplayer:  false,
+		AudioContext:   audioCtx,
+		AudioPlayer:    loadBackgroundSound(assets, audioCtx),
 	}
+
+	readFonts(assets)
+	loadUI(assets)
+
+	return &t
 }
 
-func readFonts(assets *embed.FS) {
-	// Title font load
-	title_font, err := assets.ReadFile("assets/fonts/kidpixies/KidpixiesRegular-p0Z1.ttf")
-	if err != nil {
-		log.Fatalln(err)
+func (t *TitleScreen) Update() error {
+	if !t.AudioPlayer.IsPlaying() {
+		if err := t.AudioPlayer.Rewind(); err != nil {
+			log.Fatalln("Background audio could not be rewinded:", err)
+		}
+
+		t.AudioPlayer.Play()
 	}
 
-	s, err := truetype.Parse(title_font)
-	if err != nil {
-		log.Fatal(err)
-	}
-	title_font_Face := truetype.NewFace(s, &truetype.Options{
-		Size:    8 * 6,
-		DPI:     300,
-		Hinting: font.HintingFull,
-	})
-	titlescreenFont = text.NewGoXFace(title_font_Face)
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		t.IsSingleplayer = true
 
-	// Load Button Fonts
-	btn_font, err := assets.ReadFile("assets/fonts/PressStart2p/PressStart2P-vaV7.ttf")
-	if err != nil {
-		log.Fatalln(err)
+	} else if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+		t.IsMultiplayer = true
+
 	}
 
-	ttfFont, err := truetype.Parse(btn_font)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	btnFontFace := truetype.NewFace(ttfFont, &truetype.Options{
-		Size:    5,
-		DPI:     300,
-		Hinting: font.HintingFull,
-	})
-	btnFont = text.NewGoXFace(btnFontFace)
+	return nil
 }
 
 func (t *TitleScreen) Draw(screen *ebiten.Image) {
@@ -101,16 +90,4 @@ func (t *TitleScreen) Draw(screen *ebiten.Image) {
 	opQuitBtns.GeoM.Translate(80*6, 120*6)
 	opQuitBtns.ColorScale.Scale(255, 105, 0, 1)
 	text.Draw(screen, "Quit", btnFont, opQuitBtns)
-}
-
-func (t *TitleScreen) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		t.IsSingleplayer = true
-
-	} else if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		t.IsMultiplayer = true
-
-	}
-
-	return nil
 }

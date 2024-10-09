@@ -25,10 +25,10 @@ type LogoScreen struct {
 
 	// Context
 	ctx    *audio.Context
-	player *audio.Player
+	Player *audio.Player
 }
 
-func New(assets *embed.FS) *LogoScreen {
+func New(assets *embed.FS, ctx *audio.Context) *LogoScreen {
 	// Get Logo Image
 	logoScreen, _, err := ebitenutil.NewImageFromFileSystem(assets, "assets/logo/logo_screen.png")
 	if err != nil {
@@ -53,8 +53,6 @@ func New(assets *embed.FS) *LogoScreen {
 		log.Fatalln(err)
 	}
 
-	ctx := audio.NewContext(48000)
-
 	player, err := ctx.NewPlayer(musicDecoded)
 	if err != nil {
 		log.Fatalln(err)
@@ -72,17 +70,17 @@ func New(assets *embed.FS) *LogoScreen {
 		logoScreen:    logoScreen,
 		logoEbiten:    logoEbiten,
 		ctx:           ctx,
-		player:        player,
+		Player:        player,
 	}
 }
 
 func (l *LogoScreen) Update() error {
 	// Start music as soon as possible
-	if !l.player.IsPlaying() {
-		if err := l.player.Rewind(); err != nil {
+	if !l.Player.IsPlaying() {
+		if err := l.Player.Rewind(); err != nil {
 			log.Fatalln("Could not rewind audio: ", err)
 		}
-		l.player.Play()
+		l.Player.Play()
 	}
 
 	l.ticks += 1

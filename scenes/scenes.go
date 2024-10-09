@@ -7,6 +7,7 @@ import (
 	"github.com/Captain-Santiago/PongEbiten/scenes/multiplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/singleplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/titlescreen"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
 const (
@@ -19,17 +20,21 @@ const (
 type SceneManager struct {
 	CurrentScene Scenes
 	AssetServer  *embed.FS
+
+	AudioContext *audio.Context
 }
 
 func New(assets *embed.FS) *SceneManager {
-	return &SceneManager{CurrentScene: logo.New(assets), AssetServer: assets}
+	audioCtx := audio.NewContext(48000)
+	return &SceneManager{CurrentScene: logo.New(assets, audioCtx), AssetServer: assets, AudioContext: audioCtx}
 }
 
 func (sm *SceneManager) Update() error {
 	switch sm.CurrentScene.(type) {
 	case *logo.LogoScreen:
 		if sm.CurrentScene.(*logo.LogoScreen).SecondsPassed == 4 {
-			sm.CurrentScene = titlescreen.New(sm.AssetServer)
+			sm.CurrentScene.(*logo.LogoScreen).Player.Close()
+			sm.CurrentScene = titlescreen.New(sm.AssetServer, sm.AudioContext)
 		}
 
 	case *titlescreen.TitleScreen:
