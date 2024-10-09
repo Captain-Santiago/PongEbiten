@@ -1,6 +1,7 @@
 package logo
 
 import (
+	"bytes"
 	"embed"
 	"image/color"
 	_ "image/png"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -22,8 +24,8 @@ type LogoScreen struct {
 	logoEbiten  *ebiten.Image
 
 	// Context
-	ctx            *audio.Context
-	isMusicPlaying bool
+	ctx    *audio.Context
+	player *audio.Player
 }
 
 func New(assets *embed.FS) *LogoScreen {
@@ -39,18 +41,50 @@ func New(assets *embed.FS) *LogoScreen {
 		log.Fatalln(err)
 	}
 
+	// Read music file from disk
+	musicByteArray, err := assets.ReadFile("assets/logo/background_song.ogg")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Decode music file
+	musicDecoded, err := vorbis.DecodeWithoutResampling(bytes.NewReader(musicByteArray))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	ctx := audio.NewContext(48000)
+
+	player, err := ctx.NewPlayer(musicDecoded)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = player.Rewind()
+	if err != nil {
+		log.Fatalln("Could not rewind audio: ", err)
+	}
+
 	return &LogoScreen{
-		SecondsPassed:  0,
-		ticks:          0,
-		game_assets:    assets,
-		logoScreen:     logoScreen,
-		logoEbiten:     logoEbiten,
-		ctx:            audio.NewContext(48000),
-		isMusicPlaying: false,
+		SecondsPassed: 0,
+		ticks:         0,
+		game_assets:   assets,
+		logoScreen:    logoScreen,
+		logoEbiten:    logoEbiten,
+		ctx:           ctx,
+		player:        player,
 	}
 }
 
 func (l *LogoScreen) Update() error {
+	// Start music as soon as possible
+	if !l.player.IsPlaying() {
+		if err := l.player.Rewind(); err != nil {
+			log.Fatalln("Could not rewind audio: ", err)
+		}
+		l.player.Play()
+	}
+
 	l.ticks += 1
 
 	if l.ticks == 60 {
@@ -62,11 +96,6 @@ func (l *LogoScreen) Update() error {
 }
 
 func (l *LogoScreen) Draw(screen *ebiten.Image) {
-	// Start music as soon as possible
-	if !l.isMusicPlaying {
-		l.playLogoMusic(l.game_assets)
-	}
-
 	// Scaling sizes
 	geom := ebiten.GeoM{}
 	geom.Scale(1.5, 1.5)

@@ -7,8 +7,7 @@ import (
 )
 
 type AudioMaster struct {
-	MusicPlayerCh chan *AudioPlayer
-	ErrCh         chan error
+	ErrCh chan error
 }
 
 // AudioPlayer represents the current audio state.
