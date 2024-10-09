@@ -6,13 +6,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
-const AUDIO_SAMPLE_RATE = 48000
-
-var AudioMasterControl AudioMaster
-
 type AudioMaster struct {
-	MusicPlayerCh chan *AudioPlayer
-	ErrCh         chan error
+	ErrCh chan error
 }
 
 // AudioPlayer represents the current audio state.
@@ -26,20 +21,12 @@ type AudioPlayer struct {
 	Volume128    int
 }
 
-func NewPlayer(musicPlayerCh chan *AudioPlayer, errCh chan error) *AudioPlayer {
-	audioContext := audio.NewContext(AUDIO_SAMPLE_RATE)
-
-	AudioMasterControl = AudioMaster{}
-	AudioMasterControl.MusicPlayerCh = make(chan *AudioPlayer)
-	AudioMasterControl.ErrCh = make(chan error)
-
-	audioP := &audio.Player{}
+func New() *AudioPlayer {
+	const AUDIO_SAMPLE_RATE = 48000
 
 	return &AudioPlayer{
-		AudioContext: audioContext,
-		AudioPlayer:  audioP,
+		AudioContext: audio.NewContext(AUDIO_SAMPLE_RATE),
 		Current:      0,
 		Total:        0,
-		Volume128:    75,
 	}
 }

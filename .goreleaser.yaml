@@ -6,9 +6,7 @@ before:
     - go generate ./...
 
 builds:
-  - env:
-      - CGO_ENABLED=1
-    goos:
+  - goos:
       - linux
       - windows
     goarch:
@@ -21,19 +19,11 @@ builds:
       - goos: windows
         goarch: amd64
         goamd64: v1
-        env:
-          - CC=x86_64-w64-mingw32-gcc
-          - CXX=x86_64-w64-mingw32-g++
-          - CGO_ENABLED=1
         ldflags:
           - -s -w -extldflags "-static"
 
       - goos: windows
         goarch: '386'
-        env:
-          - CC=i686-w64-mingw32-gcc
-          - CXX=i686-w64-mingw32-g++
-          - CGO_ENABLED=1
         ldflags:
           - -s -w -extldflags "-static"
 
@@ -56,4 +46,4 @@ changelog:
 
 upx:
   - enabled: true
-    compress: best
+    compress: '9'

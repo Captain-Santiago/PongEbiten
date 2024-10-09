@@ -3,66 +3,86 @@ package logo
 import (
 	"bytes"
 	"embed"
-	"image"
 	"image/color"
+	_ "image/png"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
-)
-
-var (
-	ctx            *audio.Context
-	isMusicPlaying bool
-	logoScreen     *ebiten.Image
-	logoEbiten     *ebiten.Image
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type LogoScreen struct {
-	game_assets   *embed.FS
+	// Delta Time
 	SecondsPassed uint
 	ticks         uint
+
+	// Assets
+	game_assets *embed.FS
+	logoScreen  *ebiten.Image
+	logoEbiten  *ebiten.Image
+
+	// Context
+	ctx    *audio.Context
+	player *audio.Player
 }
 
 func New(assets *embed.FS) *LogoScreen {
-	// Get logo byte array
-	logoImageFS, err := assets.ReadFile("assets/logo/logo_screen.png")
+	// Get Logo Image
+	logoScreen, _, err := ebitenutil.NewImageFromFileSystem(assets, "assets/logo/logo_screen.png")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// Decode byte array
-	logoScreenDecoded, _, err := image.Decode(bytes.NewBuffer(logoImageFS))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	logoScreen = ebiten.NewImageFromImage(logoScreenDecoded)
 
 	// Get ebiten logo
-	logoEbitenFS, err := assets.ReadFile("assets/logo/logo_ebiten.png")
+	logoEbiten, _, err := ebitenutil.NewImageFromFileSystem(assets, "assets/logo/logo_ebiten.png")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// Decode byte array
-	logoEbitenDecoded, _, err := image.Decode(bytes.NewBuffer(logoEbitenFS))
+
+	// Read music file from disk
+	musicByteArray, err := assets.ReadFile("assets/logo/background_song.ogg")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	logoEbiten = ebiten.NewImageFromImage(logoEbitenDecoded)
+
+	// Decode music file
+	musicDecoded, err := vorbis.DecodeWithoutResampling(bytes.NewReader(musicByteArray))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	ctx := audio.NewContext(48000)
+
+	player, err := ctx.NewPlayer(musicDecoded)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = player.Rewind()
+	if err != nil {
+		log.Fatalln("Could not rewind audio: ", err)
+	}
 
 	return &LogoScreen{
-		game_assets:   assets,
 		SecondsPassed: 0,
 		ticks:         0,
+		game_assets:   assets,
+		logoScreen:    logoScreen,
+		logoEbiten:    logoEbiten,
+		ctx:           ctx,
+		player:        player,
 	}
 }
 
 func (l *LogoScreen) Update() error {
-	if ctx == nil {
-		ctx = audio.NewContext(48000)
-
-		// ---------------------- DEBUG MUSIC OFF
-		isMusicPlaying = true
-		// ---------------------------
+	// Start music as soon as possible
+	if !l.player.IsPlaying() {
+		if err := l.player.Rewind(); err != nil {
+			log.Fatalln("Could not rewind audio: ", err)
+		}
+		l.player.Play()
 	}
 
 	l.ticks += 1
@@ -76,11 +96,6 @@ func (l *LogoScreen) Update() error {
 }
 
 func (l *LogoScreen) Draw(screen *ebiten.Image) {
-	// Start music as soon as possible
-	if !isMusicPlaying {
-		playLogoMusic(l.game_assets)
-	}
-
 	// Scaling sizes
 	geom := ebiten.GeoM{}
 	geom.Scale(1.5, 1.5)
@@ -89,6 +104,6 @@ func (l *LogoScreen) Draw(screen *ebiten.Image) {
 	geomEbiten.Translate(260*6, 120*6)
 
 	screen.Fill(color.White)
-	screen.DrawImage(logoScreen, &ebiten.DrawImageOptions{GeoM: geom})
-	screen.DrawImage(logoEbiten, &ebiten.DrawImageOptions{GeoM: geomEbiten})
+	screen.DrawImage(l.logoScreen, &ebiten.DrawImageOptions{GeoM: geom})
+	screen.DrawImage(l.logoEbiten, &ebiten.DrawImageOptions{GeoM: geomEbiten})
 }
