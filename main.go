@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Captain-Santiago/PongEbiten/audio"
+	"github.com/Captain-Santiago/PongEbiten/audiomaster"
 	"github.com/Captain-Santiago/PongEbiten/config"
 	"github.com/Captain-Santiago/PongEbiten/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -24,20 +24,24 @@ type Game struct {
 	GameConfig              *config.GameConfig
 	FrameCounter            uint
 	SecondsSinceGameStarted uint
-	MusicPlayerCh           chan *audio.AudioPlayer
-	ErrCh                   chan error
+
+	AudioMaster *audiomaster.AudioMaster
 }
 
 // Run 60 times a second
 func (g *Game) Update() error {
-	// Update Audio Player
-	// To do
-
 	// Check game configs
 	if inpututil.IsKeyJustPressed(ebiten.KeyF11) {
 		g.GameConfig.ToggleFullscreen()
+
+		// Quit game
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		return errors.New(CLOSE_GAME_STR)
+
+		// Toggle mute music if requested
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyM) {
+		g.AudioMaster.ToggleMute()
+
 	}
 
 	// Test if the game changed its config
@@ -61,18 +65,20 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	gamecfg := config.NewGameConfig()
-	// savegame.InitSaveFile(gamecfg.SaveFilePath)
-	// defer savegame.CloseSaveFile()
+	gamecfg := config.New()
 
 	ebiten.SetWindowSize(gamecfg.Width, gamecfg.Height)
 	ebiten.SetWindowTitle(gamecfg.Title)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetVsyncEnabled(true)
 
-	game := &Game{}
-	game.SceneManager = scenes.New(&AssetServer)
-	game.GameConfig = gamecfg
+	gameaudio := audiomaster.New(gamecfg.AudioMute)
+
+	game := &Game{
+		SceneManager: scenes.New(&AssetServer, gameaudio),
+		GameConfig:   gamecfg,
+		AudioMaster:  gameaudio,
+	}
 
 	if err := ebiten.RunGame(game); err != nil {
 		if err.Error() != CLOSE_GAME_STR {

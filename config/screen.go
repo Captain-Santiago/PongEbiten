@@ -5,6 +5,7 @@ type GameConfig struct {
 	Title         string
 	Vsync         bool
 	Fullscreen    bool
+	AudioMute     bool
 
 	// Save File
 	SaveFilePath string
@@ -18,19 +19,12 @@ func (gc *GameConfig) ToggleFullscreen() {
 	}
 }
 
-func NewGameConfig() *GameConfig {
+func New() *GameConfig {
 	return &GameConfig{
-		Width:        1280,
-		Height:       720,
-		Title:        "Go Pong Go!!!",
-		Fullscreen:   true,
-		SaveFilePath: "./save.dat",
+		Width:      1280,
+		Height:     720,
+		Title:      "Go Pong Go!!!",
+		Fullscreen: false,
+		AudioMute:  false,
 	}
 }
-
-// To do
-// func (gc *GameConfig) UpdateConfigs(newConfig *GameConfig, gameSingleton *ebiten.Game) {
-// 	if gc.Width != newConfig.Width || gc.Height != newConfig.Height {
-
-// 	}
-// }

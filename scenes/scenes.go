@@ -3,11 +3,11 @@ package scenes
 import (
 	"embed"
 
+	"github.com/Captain-Santiago/PongEbiten/audiomaster"
 	"github.com/Captain-Santiago/PongEbiten/scenes/logo"
 	"github.com/Captain-Santiago/PongEbiten/scenes/multiplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/singleplayer"
 	"github.com/Captain-Santiago/PongEbiten/scenes/titlescreen"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
 const (
@@ -21,12 +21,12 @@ type SceneManager struct {
 	CurrentScene Scenes
 	AssetServer  *embed.FS
 
-	AudioContext *audio.Context
+	// All audio related stuff
+	Music *audiomaster.AudioMaster
 }
 
-func New(assets *embed.FS) *SceneManager {
-	audioCtx := audio.NewContext(48000)
-	return &SceneManager{CurrentScene: logo.New(assets, audioCtx), AssetServer: assets, AudioContext: audioCtx}
+func New(assets *embed.FS, musicSystem *audiomaster.AudioMaster) *SceneManager {
+	return &SceneManager{CurrentScene: logo.New(assets, musicSystem.Context), AssetServer: assets, Music: musicSystem}
 }
 
 func (sm *SceneManager) Update() error {
@@ -34,7 +34,7 @@ func (sm *SceneManager) Update() error {
 	case *logo.LogoScreen:
 		if sm.CurrentScene.(*logo.LogoScreen).SecondsPassed == 4 {
 			sm.CurrentScene.(*logo.LogoScreen).Player.Close()
-			sm.CurrentScene = titlescreen.New(sm.AssetServer, sm.AudioContext)
+			sm.CurrentScene = titlescreen.New(sm.AssetServer, sm.Music.Context)
 		}
 
 	case *titlescreen.TitleScreen:

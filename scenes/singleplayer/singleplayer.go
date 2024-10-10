@@ -74,5 +74,8 @@ func (s *Singleplayer) Update() error {
 	s.enemy.BallY = s.ball.PosY
 	s.enemy.Update()
 
+	// Update player logic
+	s.player1.Update()
+
 	return nil
 }

@@ -23,6 +23,18 @@ func New(initialPosX, initialPosY, width, height float32, playerColor color.Colo
 	}
 }
 
+func (p *Player) Update() error {
+	if p.PosY <= 0 {
+		p.PosY = 0
+
+	} else if p.PosY >= 870 {
+		p.PosY = 870
+
+	}
+
+	return nil
+}
+
 func (p *Player) Draw(screen *ebiten.Image) {
 	vector.DrawFilledRect(screen, p.PosX, p.PosY, p.width, p.height, p.color, false)
 }
